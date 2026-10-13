@@ -42,6 +42,13 @@ jobs:
         env:
           VITE_API_URL: ${{ secrets.DEV_VITE_API_URL }}
           VITE_APP_VERSION: ${{ github.sha }}
+          # Deep link the web app redirects to after a successful subscription
+          # payment, to send the user back into the mobile app. Fixed literal
+          # value (not a secret, not environment-specific — same scheme for
+          # dev and prod), per the welcome-email/web-payments feature's
+          # requirements. The mypapervault:// scheme itself is registered in
+          # the mobile app's own code, not anything server-side.
+          VITE_MOBILE_RETURN_URL: mypapervault://subscription/success
         run: npm run build
 
       # ── 5. Configure AWS credentials (OIDC) ──────────────────────────────
