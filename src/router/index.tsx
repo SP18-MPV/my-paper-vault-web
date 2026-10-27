@@ -21,6 +21,7 @@ const Login = lazy(() => import("@/pages/Login"));
 const DocumentArchive = lazy(() => import("@/pages/DocumentArchive"));
 const VaultDocuments = lazy(() => import("@/pages/VaultDocuments"));
 const PublicUpload = lazy(() => import("@/pages/PublicUpload"));
+const MagicAuth = lazy(() => import("@/pages/MagicAuth"));
 
 const PageLoader = () => (
   <div className="flex-1 flex items-center justify-center min-h-64">
@@ -63,6 +64,9 @@ function AppRouter() {
 
         {/* Fully public — accessible regardless of auth state */}
         <Route path="/upload/:token" element={<PublicUpload />} />
+        {/* Welcome-email sign-in link. Not under PublicOnlyRoute: a signed-in
+            visitor must still have the link processed, not bounced to /home. */}
+        <Route path="/auth/magic" element={<MagicAuth />} />
 
         {/* Private — redirect to /login if not logged in */}
         <Route element={<ProtectedRoute />}>
