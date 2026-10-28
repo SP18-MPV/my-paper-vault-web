@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useSubscriptionStore } from "@/store/subscriptionStore";
 import { parseBytes } from "@/api/endpoints/subscriptions";
+import { formatNaira } from "@/utils/price.utils";
 
 const GiB = 1024 ** 3;
 const MiB = 1024 ** 2;
@@ -81,7 +82,7 @@ const PlanCard = () => {
 
   const priceLabel =
     subscription.price_at_purchase > 0
-      ? ` · ₦${subscription.price_at_purchase.toLocaleString()}`
+      ? ` · ${formatNaira(subscription.price_at_purchase)}`
       : "";
 
   const usedPercent = storage?.used_percent ?? 0;

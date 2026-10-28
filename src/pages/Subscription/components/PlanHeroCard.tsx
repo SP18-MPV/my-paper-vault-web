@@ -8,6 +8,7 @@ import {
 import type { IconType } from "react-icons";
 import { parseBytes } from "@/api/endpoints/subscriptions";
 import type { MySubscription } from "@/api/endpoints/subscriptions";
+import { formatNaira } from "@/utils/price.utils";
 
 const GiB = 1024 ** 3;
 const MiB = 1024 ** 2;
@@ -114,7 +115,7 @@ const PlanHeroCard = ({ subscription }: PlanHeroCardProps) => {
       <div className="relative">
         <div className="flex items-baseline gap-1.5">
           <span className="text-white text-3xl font-extrabold">
-            ${subscription.price_at_purchase.toFixed(2)}
+            {formatNaira(subscription.price_at_purchase)}
           </span>
           <span className="text-white/60 text-sm">
             /{billingLabel === "Monthly" ? "mo" : "yr"}

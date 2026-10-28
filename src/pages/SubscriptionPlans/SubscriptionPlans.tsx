@@ -6,6 +6,7 @@ import {
   useSubscribeToPlan,
   useStartTrial,
 } from "@/hooks/useSubscriptionPlans";
+import { useInitializePayment } from "@/hooks/usePayments";
 import { useSubscriptionStore } from "@/store/subscriptionStore";
 import { handleApiError } from "@/errors/errorHandler";
 import { toast } from "@/lib/toast";
@@ -25,11 +26,36 @@ const SubscriptionPlans = () => {
 
   const { mutate: subscribe } = useSubscribeToPlan();
   const { mutate: trial } = useStartTrial();
+  const { mutate: startCheckout } = useInitializePayment();
 
   const activePlans = (plans ?? []).filter((p) => p.is_active);
 
   const handleSubscribe = (planId: string, cycle: BillingCycle) => {
     setLoadingPlanId(planId);
+
+    const plan = activePlans.find((p) => p.id === planId);
+    const price = cycle === "YEARLY" ? plan?.yearly_price : plan?.monthly_price;
+
+    // Paid plans are activated only by a verified payment: send the user to
+    // Flutterwave's checkout, which returns them to /payments/callback.
+    if (price && price > 0) {
+      startCheckout(
+        { planId, billingCycle: cycle },
+        {
+          onSuccess: (res) => {
+            if (!res.success) {
+              toast.error("Couldn't start the payment", "Please try again.");
+              setLoadingPlanId(null);
+              return;
+            }
+            window.location.assign(res.data.payment_url);
+          },
+          onError: () => setLoadingPlanId(null),
+        },
+      );
+      return;
+    }
+
     subscribe(
       { planId, billingCycle: cycle },
       {

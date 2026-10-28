@@ -22,6 +22,7 @@ const DocumentArchive = lazy(() => import("@/pages/DocumentArchive"));
 const VaultDocuments = lazy(() => import("@/pages/VaultDocuments"));
 const PublicUpload = lazy(() => import("@/pages/PublicUpload"));
 const MagicAuth = lazy(() => import("@/pages/MagicAuth"));
+const PaymentCallback = lazy(() => import("@/pages/PaymentCallback"));
 
 const PageLoader = () => (
   <div className="flex-1 flex items-center justify-center min-h-64">
@@ -70,6 +71,9 @@ function AppRouter() {
 
         {/* Private — redirect to /login if not logged in */}
         <Route element={<ProtectedRoute />}>
+          {/* Flutterwave returns here after checkout. Full-page (no
+              dashboard), since app users are sent straight back to the app. */}
+          <Route path="/payments/callback" element={<PaymentCallback />} />
           <Route element={<DashboardLayout />}>
             <Route path="/home" element={<Home />} />
             <Route path="/documents" element={<DocumentArchive />} />
