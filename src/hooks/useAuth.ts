@@ -8,6 +8,8 @@ import {
   signOutAll,
   forgotPassword,
   resetPassword,
+  exchangeMagicLink,
+  type MagicLinkExchangeResponse,
   type SignupResponse,
   type SigninResponse,
   type SignoutResponse,
@@ -49,6 +51,24 @@ const clearAllStores = (queryClient: ReturnType<typeof useQueryClient>) => {
   queryClient.clear();
   useSubscriptionStore.getState().clear();
   useAuthStore.getState().clearSession();
+};
+
+// Signs in with the one-time token from the welcome email. No error toast:
+// the magic-link page shows its own "link expired" state.
+export const useMagicLinkSignIn = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<MagicLinkExchangeResponse, AppError, string>({
+    mutationFn: exchangeMagicLink,
+    onSuccess: (data) => {
+      if (!data.success) return;
+      // Another account may already be signed in on this browser — drop its
+      // cached data before switching to the new session.
+      clearAllStores(queryClient);
+      const { user, ...tokens } = data.data;
+      useAuthStore.getState().setSession({ tokens, user });
+    },
+  });
 };
 
 export const useSignOut = () => {

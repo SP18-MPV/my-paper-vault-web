@@ -24,6 +24,20 @@ export const signIn = async (body: {
   return data!;
 };
 
+export type MagicLinkExchangeResponse =
+  components["schemas"]["MagicLinkExchangeResponse"];
+
+// Exchanges the one-time token from the welcome email's link for a session.
+export const exchangeMagicLink = async (
+  token: string,
+): Promise<MagicLinkExchangeResponse> => {
+  const { data } = await apiClient.POST("/auth/magic-link/exchange", {
+    body: { token },
+    headers: getDeviceHeaders(),
+  });
+  return data!;
+};
+
 export const signUp = async (body: {
   email: string;
   name: string;

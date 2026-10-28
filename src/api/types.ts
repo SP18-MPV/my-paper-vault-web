@@ -241,6 +241,62 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/magic-link/exchange": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign in with the one-time link from the welcome email */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        token: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description MagicLinkExchangeResponse */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MagicLinkExchangeResponse"];
+                    };
+                };
+                /** @description Validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            errors?: unknown;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/signout": {
         parameters: {
             query?: never;
@@ -2433,6 +2489,7 @@ export interface paths {
                         monthly_price: number;
                         yearly_price: number;
                         max_storage_bytes: number;
+                        max_file_size_bytes: number;
                         /** @default true */
                         allow_family_connections?: boolean;
                         /** @default null */
@@ -2515,6 +2572,7 @@ export interface paths {
                         monthly_price?: number;
                         yearly_price?: number;
                         max_storage_bytes?: number;
+                        max_file_size_bytes?: number;
                         allow_family_connections?: boolean;
                         max_family_connections?: number | null;
                         max_directory_members?: number | null;
@@ -3225,6 +3283,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payments/initialize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Initialize a Flutterwave payment for a subscription plan */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        plan_id: string;
+                        /**
+                         * @default MONTHLY
+                         * @enum {string}
+                         */
+                        billing_cycle?: "MONTHLY" | "QUARTERLY" | "YEARLY";
+                    };
+                };
+            };
+            responses: {
+                /** @description InitializePaymentResponse */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InitializePaymentResponse"];
+                    };
+                };
+                /** @description Validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            errors?: unknown;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify a Flutterwave transaction and activate the subscription */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        tx_ref: string;
+                        transaction_id: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description VerifyPaymentResponse */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VerifyPaymentResponse"];
+                    };
+                };
+                /** @description Validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            errors?: unknown;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3268,6 +3445,32 @@ export interface components {
             data: unknown;
         };
         SigninResponse: {
+            success: boolean;
+            message: string;
+            data: {
+                access_token: string;
+                id_token: string;
+                refresh_token: string;
+                expires_in: number;
+                token_type: string;
+                session_id: string;
+                user: {
+                    id: string;
+                    email: string;
+                    name: string;
+                    gender: string | null;
+                    phone_number: string | null;
+                    age: number | null;
+                    is_verified: boolean;
+                    is_active: boolean;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: date-time */
+                    updated_at: string;
+                };
+            };
+        };
+        MagicLinkExchangeResponse: {
             success: boolean;
             message: string;
             data: {
@@ -3917,6 +4120,7 @@ export interface components {
                 monthly_price: number;
                 yearly_price: number;
                 max_storage_bytes: string;
+                max_file_size_bytes: string;
                 allow_family_connections: boolean;
                 max_family_connections: number | null;
                 max_directory_members: number | null;
@@ -3941,6 +4145,7 @@ export interface components {
                 monthly_price: number;
                 yearly_price: number;
                 max_storage_bytes: string;
+                max_file_size_bytes: string;
                 allow_family_connections: boolean;
                 max_family_connections: number | null;
                 max_directory_members: number | null;
@@ -3965,6 +4170,7 @@ export interface components {
                 monthly_price: number;
                 yearly_price: number;
                 max_storage_bytes: string;
+                max_file_size_bytes: string;
                 allow_family_connections: boolean;
                 max_family_connections: number | null;
                 max_directory_members: number | null;
@@ -4016,6 +4222,7 @@ export interface components {
                         monthly_price: number;
                         yearly_price: number;
                         max_storage_bytes: string;
+                        max_file_size_bytes: string;
                         allow_family_connections: boolean;
                         max_family_connections: number | null;
                         max_directory_members: number | null;
@@ -4075,6 +4282,7 @@ export interface components {
                     monthly_price: number;
                     yearly_price: number;
                     max_storage_bytes: string;
+                    max_file_size_bytes: string;
                     allow_family_connections: boolean;
                     max_family_connections: number | null;
                     max_directory_members: number | null;
@@ -4126,6 +4334,7 @@ export interface components {
                     monthly_price: number;
                     yearly_price: number;
                     max_storage_bytes: string;
+                    max_file_size_bytes: string;
                     allow_family_connections: boolean;
                     max_family_connections: number | null;
                     max_directory_members: number | null;
@@ -4177,6 +4386,7 @@ export interface components {
                     monthly_price: number;
                     yearly_price: number;
                     max_storage_bytes: string;
+                    max_file_size_bytes: string;
                     allow_family_connections: boolean;
                     max_family_connections: number | null;
                     max_directory_members: number | null;
@@ -4228,6 +4438,7 @@ export interface components {
                     monthly_price: number;
                     yearly_price: number;
                     max_storage_bytes: string;
+                    max_file_size_bytes: string;
                     allow_family_connections: boolean;
                     max_family_connections: number | null;
                     max_directory_members: number | null;
@@ -4423,6 +4634,90 @@ export interface components {
                 file_size: number;
                 /** Format: date-time */
                 created_at: string;
+            };
+        };
+        InitializePaymentResponse: {
+            success: boolean;
+            message: string;
+            data: {
+                tx_ref: string;
+                payment_url: string;
+            };
+        };
+        VerifyPaymentResponse: {
+            success: boolean;
+            message: string;
+            data: {
+                transaction: {
+                    id: string;
+                    user_id: string;
+                    subscription_plan_id: string;
+                    user_subscription_id: string | null;
+                    /** @enum {string} */
+                    billing_cycle: "MONTHLY" | "QUARTERLY" | "YEARLY";
+                    /** @enum {string} */
+                    status: "PENDING" | "SUCCESSFUL" | "FAILED" | "CANCELLED";
+                    amount: number;
+                    currency: string;
+                    tx_ref: string;
+                    flw_transaction_id: string | null;
+                    payment_type: string | null;
+                    payment_url: string | null;
+                    /** Format: date-time */
+                    verified_at: string | null;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: date-time */
+                    updated_at: string;
+                };
+                subscription: {
+                    id: string;
+                    user_id: string;
+                    subscription_plan_id: string;
+                    /** @enum {string} */
+                    billing_cycle: "MONTHLY" | "QUARTERLY" | "YEARLY";
+                    price_at_purchase: number;
+                    /** @enum {string} */
+                    status: "ACTIVE" | "GRACE" | "RESTRICTED" | "ARCHIVED" | "CANCELLED";
+                    storage_used_bytes: string;
+                    /** Format: date-time */
+                    start_date: string;
+                    /** Format: date-time */
+                    end_date: string;
+                    /** Format: date-time */
+                    trial_ends_at: string | null;
+                    /** Format: date-time */
+                    grace_period_started_at: string | null;
+                    /** Format: date-time */
+                    restricted_at: string | null;
+                    /** Format: date-time */
+                    archived_at: string | null;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: date-time */
+                    updated_at: string;
+                    subscriptionPlan: {
+                        id: string;
+                        name: string;
+                        monthly_price: number;
+                        yearly_price: number;
+                        max_storage_bytes: string;
+                        max_file_size_bytes: string;
+                        allow_family_connections: boolean;
+                        max_family_connections: number | null;
+                        max_directory_members: number | null;
+                        max_upload_members: number | null;
+                        max_download_members: number | null;
+                        /** @enum {string} */
+                        download_limit_scope: "PER_DIRECTORY" | "TOTAL";
+                        trial_days: number | null;
+                        is_active: boolean;
+                        /** Format: date-time */
+                        created_at: string;
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                } | null;
             };
         };
     };

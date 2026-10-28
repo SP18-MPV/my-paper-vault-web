@@ -3,6 +3,7 @@ import type { IconType } from "react-icons";
 import { parseBytes } from "@/api/endpoints/subscriptions";
 import type { SubscriptionPlan } from "@/api/endpoints/subscriptions";
 import Button from "@/components/common/Button/Button";
+import { formatNaira } from "@/utils/price.utils";
 
 export type BillingCycle = "MONTHLY" | "YEARLY";
 
@@ -14,8 +15,7 @@ const formatStorage = (bytes: number) =>
     ? `${(bytes / GiB).toFixed(0)} GB`
     : `${(bytes / MiB).toFixed(0)} MB`;
 
-const formatPrice = (price: number) =>
-  price === 0 ? "Free" : `$${price.toFixed(2)}`;
+const formatPrice = (kobo: number) => (kobo === 0 ? "Free" : formatNaira(kobo));
 
 interface FeatureRowProps {
   icon: IconType;

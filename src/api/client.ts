@@ -10,6 +10,7 @@ const PUBLIC_ENDPOINTS = [
   "/auth/verify",
   "/auth/resend-verification",
   "/auth/refresh-token",
+  "/auth/magic-link/exchange",
 ];
 
 const fetchWithNetworkError: typeof fetch = async (input, init) => {
@@ -126,7 +127,11 @@ apiClient.use({
     if (response.status !== 401) return response;
 
     const url = new URL(request.url);
-    if (url.pathname.endsWith("/auth/refresh-token")) return response;
+    // Public endpoints don't use the access token, so a 401 there (wrong
+    // password, expired magic link) can't be fixed by refreshing it.
+    if (PUBLIC_ENDPOINTS.some((ep) => url.pathname.endsWith(ep))) {
+      return response;
+    }
 
     const newToken = await refreshAccessToken();
 

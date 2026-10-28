@@ -1,5 +1,6 @@
 import { MdOutlineCalendarMonth } from "react-icons/md";
 import type { MySubscription } from "@/api/endpoints/subscriptions";
+import { formatNaira } from "@/utils/price.utils";
 
 const daysUntil = (dateStr: string) =>
   Math.max(
@@ -53,7 +54,7 @@ const BillingCard = ({ subscription, canCancel, onCancelClick }: BillingCardProp
           {new Date(subscription.end_date).toLocaleDateString()}
         </BillingRow>
         <BillingRow label="Amount">
-          ${subscription.price_at_purchase.toFixed(2)}
+          {formatNaira(subscription.price_at_purchase)}
         </BillingRow>
         <BillingRow label="Start Date">
           {new Date(subscription.start_date).toLocaleDateString()}
