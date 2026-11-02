@@ -7,6 +7,7 @@ import {
   useStartTrial,
 } from "@/hooks/useSubscriptionPlans";
 import { useInitializePayment } from "@/hooks/usePayments";
+import { isFreePlan } from "@/api/endpoints/subscriptions";
 import { useSubscriptionStore } from "@/store/subscriptionStore";
 import { handleApiError } from "@/errors/errorHandler";
 import { toast } from "@/lib/toast";
@@ -22,7 +23,9 @@ const SubscriptionPlans = () => {
 
   const { data: plans, isLoading } = useSubscriptionPlans();
   const subscription = useSubscriptionStore((s) => s.subscription);
+  const freePlanUsed = useSubscriptionStore((s) => s.freePlanUsed);
   const currentPlanId = subscription?.subscription_plan_id ?? null;
+  const onFreePlan = !!subscription && isFreePlan(subscription.subscriptionPlan);
 
   const { mutate: subscribe } = useSubscribeToPlan();
   const { mutate: trial } = useStartTrial();
@@ -124,6 +127,8 @@ const SubscriptionPlans = () => {
                   billingCycle={billingCycle}
                   isCurrent={plan.id === currentPlanId}
                   hasSubscription={!!subscription}
+                  onFreePlan={onFreePlan}
+                  freePlanUsed={freePlanUsed}
                   onSubscribe={handleSubscribe}
                   onTrial={handleTrial}
                   isLoading={loadingPlanId === plan.id}

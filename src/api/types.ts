@@ -3402,6 +3402,62 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payments/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Flutterwave webhook — server-side reconciliation for payments the client never confirmed */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            responses: {
+                /** @description WebhookResponse */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WebhookResponse"];
+                    };
+                };
+                /** @description Validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            errors?: unknown;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3437,6 +3493,7 @@ export interface components {
                     /** Format: date-time */
                     updated_at: string;
                 };
+                welcome_email_sent: boolean;
             } | null;
         };
         ResendVerificationResponse: {
@@ -4245,6 +4302,7 @@ export interface components {
                     /** @enum {string} */
                     threshold: "OK" | "WARNING_80" | "WARNING_95" | "BLOCKED";
                 };
+                free_plan_used: boolean;
             };
         };
         SubscribeResponse: {
@@ -4718,6 +4776,13 @@ export interface components {
                         updated_at: string;
                     };
                 } | null;
+            };
+        };
+        WebhookResponse: {
+            success: boolean;
+            message: string;
+            data: {
+                received: boolean;
             };
         };
     };

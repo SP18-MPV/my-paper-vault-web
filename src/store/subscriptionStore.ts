@@ -12,6 +12,8 @@ const statusIsActive = (sub: MySubscription | null): sub is MySubscription =>
 interface SubscriptionState {
   subscription: MySubscription | null;
   storage: MyStorage | null;
+  // The free plan is one-time: once used, it can't be chosen again.
+  freePlanUsed: boolean;
   isLoaded: boolean;
 
   // Actions
@@ -34,14 +36,15 @@ interface SubscriptionState {
 export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   subscription: null,
   storage: null,
+  freePlanUsed: false,
   isLoaded: false,
 
-  setData: ({ subscription, storage }) =>
-    set({ subscription, storage, isLoaded: true }),
+  setData: ({ subscription, storage, free_plan_used }) =>
+    set({ subscription, storage, freePlanUsed: free_plan_used, isLoaded: true }),
 
   markLoaded: () => set({ isLoaded: true }),
 
-  clear: () => set({ subscription: null, storage: null, isLoaded: false }),
+  clear: () => set({ subscription: null, storage: null, freePlanUsed: false, isLoaded: false }),
 
   isActive: () => statusIsActive(get().subscription),
 
