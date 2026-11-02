@@ -13,7 +13,12 @@ export type StorageThreshold = MyStorage['threshold'];
 export type SubscriptionData = {
   subscription: MySubscription;
   storage: MyStorage;
+  free_plan_used: boolean;
 };
+
+// The free plan: priced 0 for both billing cycles. Every user gets it once.
+export const isFreePlan = (plan: { monthly_price: number; yearly_price: number }) =>
+  plan.monthly_price === 0 && plan.yearly_price === 0;
 
 /** Parse a BigInt-serialised byte string (e.g. "10737418240") to a JS number. */
 export const parseBytes = (value: string): number => parseInt(value, 10);

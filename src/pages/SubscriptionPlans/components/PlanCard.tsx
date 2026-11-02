@@ -1,6 +1,6 @@
 import { MdCheck, MdOutlineStars, MdOutlineStorage, MdOutlinePeopleAlt, MdOutlineCloudUpload, MdOutlineFileDownload } from "react-icons/md";
 import type { IconType } from "react-icons";
-import { parseBytes } from "@/api/endpoints/subscriptions";
+import { parseBytes, isFreePlan } from "@/api/endpoints/subscriptions";
 import type { SubscriptionPlan } from "@/api/endpoints/subscriptions";
 import Button from "@/components/common/Button/Button";
 import { formatNaira } from "@/utils/price.utils";
@@ -39,6 +39,10 @@ export interface PlanCardProps {
   billingCycle: BillingCycle;
   isCurrent: boolean;
   hasSubscription: boolean;
+  // The user's current subscription is the free plan.
+  onFreePlan: boolean;
+  // The free plan is one-time; once used it can't be chosen again.
+  freePlanUsed: boolean;
   onSubscribe: (planId: string, cycle: BillingCycle) => void;
   onTrial: (planId: string) => void;
   isLoading: boolean;
@@ -49,6 +53,8 @@ const PlanCard = ({
   billingCycle,
   isCurrent,
   hasSubscription,
+  onFreePlan,
+  freePlanUsed,
   onSubscribe,
   onTrial,
   isLoading,
@@ -57,7 +63,16 @@ const PlanCard = ({
   const monthlyEquiv =
     billingCycle === "YEARLY" ? plan.yearly_price / 12 : plan.monthly_price;
   const displayPrice = formatPrice(monthlyEquiv);
-  const canTrial = !hasSubscription && !!plan.trial_days && plan.trial_days > 0;
+  // A trial is available from the free plan (where every user starts) or
+  // with no subscription at all.
+  const canTrial =
+    (!hasSubscription || onFreePlan) && !!plan.trial_days && plan.trial_days > 0;
+  const freeAlreadyUsed = isFreePlan(plan) && freePlanUsed;
+  const subscribeLabel = !hasSubscription
+    ? "Subscribe"
+    : onFreePlan
+      ? "Upgrade to This Plan"
+      : "Switch to This Plan";
 
   const features: FeatureRowProps[] = [
     {
@@ -142,6 +157,10 @@ const PlanCard = ({
           <MdCheck size={14} />
           Current Plan
         </div>
+      ) : freeAlreadyUsed ? (
+        <div className="flex items-center justify-center py-2.5 rounded-xl bg-slate-50 text-slate-400 text-xs font-semibold">
+          Free plan already used
+        </div>
       ) : canTrial ? (
         <div className="flex flex-col gap-2">
           <Button
@@ -152,7 +171,7 @@ const PlanCard = ({
             onClick={() => onTrial(plan.id)}
           />
           <Button
-            label={hasSubscription ? "Switch to This Plan" : "Subscribe"}
+            label={subscribeLabel}
             variant="outlined"
             loading={isLoading}
             onClick={() => onSubscribe(plan.id, billingCycle)}
@@ -160,7 +179,7 @@ const PlanCard = ({
         </div>
       ) : (
         <Button
-          label={hasSubscription ? "Switch to This Plan" : "Subscribe"}
+          label={subscribeLabel}
           variant="contained"
           loading={isLoading}
           onClick={() => onSubscribe(plan.id, billingCycle)}
